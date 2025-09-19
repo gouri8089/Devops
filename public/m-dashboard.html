@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<script>
+  const token = localStorage.getItem("token");
+  if (!token) {
+    
+      // You are not on the login page
+      alert("You are not logged in. Redirecting to login page.");
+      window.location.href = "./login.html";
+    
+    
+  }
+</script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manager Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+  <!-- Sidebar for Manager -->
+  <aside class="w-64 bg-white shadow-lg p-6 hidden md:block">
+    <h1 class="text-2xl font-bold text-blue-600 mb-8">Alert System</h1>
+    <nav class="space-y-4">
+      <a href="#" class="block text-blue-600 font-bold">Dashboard</a>
+      <a href="./m-user-alerts.html" class="block text-gray-700 hover:text-blue-600 font-medium">User Alerts</a>
+      <a href="./m-alerts-by-type.html" class="block text-gray-700 hover:text-blue-600 font-medium">Alerts By Type</a>
+      <a href="./m-alert-history.html" class="block text-gray-700 hover:text-blue-600 font-medium">Alert History</a>
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <div class="flex-1 flex flex-col">
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-md flex items-center justify-between px-6 py-4">
+      <div class="flex items-center space-x-4">
+        <img src="./images/logo.avif" class="h-10 w-10 rounded-full" alt="Logo">
+        <span class="text-xl font-semibold text-gray-800">Manager Dashboard</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <img src="./images/user.png" class="h-10 w-10 rounded-full" alt="Profile" />
+        <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+        <script src="./js/logout.js"></script>
+      </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <main class="p-6 space-y-8 flex-1">
+
+      <!-- Top Summary Metrics -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+          <h3 class="text-gray-700 font-semibold text-lg">Total Alerts</h3>
+          <p class="text-4xl font-bold text-blue-500 mt-2">1245</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+          <h3 class="text-gray-700 font-semibold text-lg">Upcoming Alerts</h3>
+          <p class="text-4xl font-bold text-yellow-500 mt-2">278</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+          <h3 class="text-gray-700 font-semibold text-lg">Sent Today</h3>
+          <p class="text-4xl font-bold text-green-500 mt-2">95</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+          <h3 class="text-gray-700 font-semibold text-lg">Users with Expiring Docs</h3>
+          <p class="text-4xl font-bold text-red-500 mt-2">33</p>
+        </div>
+      </div>
+
+      <!-- Recent Alerts Table -->
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-xl font-semibold mb-4">Most Recent Alerts Sent</h3>
+        <div class="overflow-auto">
+          <table class="min-w-full text-left text-sm">
+            <thead class="bg-gray-100 text-gray-700 font-semibold">
+              <tr>
+                <th class="p-4">Alert ID</th>
+                <th class="p-4">Document</th>
+                <th class="p-4">User</th>
+                <th class="p-4">Method</th>
+                <th class="p-4">Status</th>
+                <th class="p-4">Time</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr>
+                <td class="p-4">ALRT-1009</td>
+                <td class="p-4">Passport</td>
+                <td class="p-4">Jane Doe</td>
+                <td class="p-4">SMS</td>
+                <td class="p-4 text-green-600 font-medium">Sent</td>
+                <td class="p-4">10:32 AM</td>
+              </tr>
+              <tr>
+                <td class="p-4">ALRT-1008</td>
+                <td class="p-4">Prescription</td>
+                <td class="p-4">John Smith</td>
+                <td class="p-4">Push</td>
+                <td class="p-4 text-green-600 font-medium">Sent</td>
+                <td class="p-4">9:50 AM</td>
+              </tr>
+              <!-- Add dynamic rows here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Chart Buttons -->
+      <div class="flex flex-wrap gap-4">
+        <button onclick="toggleChart('type')" class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600">
+          Show Alerts Type Graph
+        </button>
+        <button onclick="toggleChart('status')" class="bg-purple-500 text-white px-6 py-3 rounded hover:bg-purple-600">
+          Show Alerts Status Graph
+        </button>
+      </div>
+
+      <!-- Charts -->
+      <div class="bg-white p-6 rounded-xl shadow hidden" id="typeChartContainer">
+        <canvas id="typeChart" height="100"></canvas>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl shadow hidden" id="statusChartContainer">
+        <canvas id="statusChart" height="100"></canvas>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Chart.js Logic -->
+  <script>
+    const typeChartData = {
+      labels: ['SMS', 'Push', 'Email'],
+      datasets: [{
+        label: 'Alerts by Type',
+        data: [400, 300, 545],
+        backgroundColor: ['#3B82F6', '#F59E0B', '#10B981'],
+      }]
+    };
+
+    const statusChartData = {
+      labels: ['Sent', 'Pending', 'Missed'],
+      datasets: [{
+        label: 'Alerts by Status',
+        data: [700, 200, 100],
+        backgroundColor: ['#10B981', '#FBBF24', '#EF4444'],
+      }]
+    };
+
+    const typeChart = new Chart(document.getElementById('typeChart'), {
+      type: 'bar',
+      data: typeChartData,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+
+    const statusChart = new Chart(document.getElementById('statusChart'), {
+      type: 'pie',
+      data: statusChartData,
+      options: {
+        responsive: true
+      }
+    });
+
+    function toggleChart(type) {
+      document.getElementById('typeChartContainer').classList.add('hidden');
+      document.getElementById('statusChartContainer').classList.add('hidden');
+      if (type === 'type') {
+        document.getElementById('typeChartContainer').classList.remove('hidden');
+      } else {
+        document.getElementById('statusChartContainer').classList.remove('hidden');
+      }
+    }
+  </script>
+
+</body>
+</html>

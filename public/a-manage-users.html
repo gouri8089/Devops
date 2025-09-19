@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<script>
+  const token = localStorage.getItem("token");
+  if (!token) {
+    
+      // You are not on the login page
+      alert("You are not logged in. Redirecting to login page.");
+      window.location.href = "./login.html";
+    
+    
+  }
+</script>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Users - Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex min-h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md p-6 hidden md:block">
+    <h1 class="text-2xl font-bold text-blue-600 mb-8">Alert System</h1>
+    <nav class="space-y-4">
+      <a href="./a-dashboard.html" class="block text-gray-700 hover:text-blue-600">Dashboard</a>
+      <a href="#" class="block font-bold text-blue-600">Manage Users</a>
+      <a href="./a-manage-roles.html" class="block text-gray-700 hover:text-blue-600">Manage Roles</a>
+      <a href="./a-all-alerts.html" class="block text-gray-700 hover:text-blue-600">All Alerts</a>
+      <a href="./a-system-alert-settings.html" class="block text-gray-700 hover:text-blue-600">System Alert Settings</a>
+      <a href="./a-alerts-history.html" class="block text-gray-700 hover:text-blue-600">Alert History</a>
+      <a href="./a-permissions.html" class="block text-gray-700 hover:text-blue-600">Permissions and Access Control</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Navbar -->
+    <header class="bg-white shadow-md flex items-center justify-between px-6 py-4">
+      <div class="flex items-center space-x-4">
+        <img src="./images/logo.avif" alt="Logo" class="h-10 w-10 rounded-full" />
+        <span class="text-xl font-semibold text-gray-800">Manage Users</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <img src="./images/user.png" alt="Profile" class="h-10 w-10 rounded-full" />
+        <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+        <script src="./js/logout.js"></script>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="p-6 space-y-6 flex-1">
+      <!-- Actions -->
+       <!-- Search Bar -->
+<div class="relative max-w-md w-full mb-4">
+  <input 
+    type="text" 
+    id="userSearch" 
+    placeholder="Search users by name or email..." 
+    class="w-full border border-gray-300 px-4 py-2 rounded shadow-sm focus:ring focus:border-blue-400"
+    oninput="filterUsers()" 
+  />
+  <ul 
+    id="searchSuggestions" 
+    class="absolute z-10 bg-white border border-gray-200 w-full mt-1 rounded shadow hidden max-h-60 overflow-y-auto"
+  >
+    <!-- Suggestions will be inserted here -->
+  </ul>
+</div>
+
+      <div class="flex justify-between items-center mb-4">
+        <button onclick="document.getElementById('addUserModal').classList.remove('hidden')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Add User
+        </button>
+      </div>
+
+      <!-- User Table -->
+      <div class="overflow-x-auto bg-white rounded-xl shadow">
+        <table class="min-w-full text-sm text-left">
+          <thead class="bg-gray-100 text-gray-700 uppercase">
+            <tr>
+              <th class="px-6 py-3">Name</th>
+              <th class="px-6 py-3">Email</th>
+              <th class="px-6 py-3">Role</th>
+              <th class="px-6 py-3">Status</th>
+              <th class="px-6 py-3">Last Login</th>
+              <th class="px-6 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y">
+            <tr>
+              <td class="px-6 py-4 font-medium text-gray-900">John Doe</td>
+              <td class="px-6 py-4">john@example.com</td>
+              <td class="px-6 py-4">User</td>
+              <td class="px-6 py-4 text-green-600 font-semibold">Active</td>
+              <td class="px-6 py-4">2025-06-01 08:45</td>
+              <td class="px-6 py-4 space-x-2">
+                <button class="text-blue-600 hover:underline" onclick="document.getElementById('editUserModal').classList.remove('hidden')">Edit</button>
+                <button class="text-red-600 hover:underline">Delete</button>
+                <button class="text-purple-600 hover:underline">Assign Role</button>
+              </td>
+            </tr>
+            <!-- More rows as needed -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add User Modal -->
+  <div id="addUserModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden">
+    <div class="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
+      <h2 class="text-lg font-semibold mb-4">Add New User</h2>
+      <form class="space-y-4">
+        <input type="text" placeholder="Full Name" class="w-full border px-4 py-2 rounded" required />
+        <input type="email" placeholder="Email" class="w-full border px-4 py-2 rounded" required />
+        <select class="w-full border px-4 py-2 rounded">
+          <option>User</option>
+          <option>Manager</option>
+          <option>Admin</option>
+        </select>
+        <div class="flex justify-end space-x-2">
+          <button type="button" class="bg-gray-300 px-4 py-2 rounded" onclick="document.getElementById('addUserModal').classList.add('hidden')">Cancel</button>
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit User Modal (same structure as Add) -->
+  <div id="editUserModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden">
+    <div class="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
+      <h2 class="text-lg font-semibold mb-4">Edit User</h2>
+      <form class="space-y-4">
+        <input type="text" placeholder="Full Name" class="w-full border px-4 py-2 rounded" value="John Doe" />
+        <input type="email" placeholder="Email" class="w-full border px-4 py-2 rounded" value="john@example.com" />
+        <select class="w-full border px-4 py-2 rounded">
+          <option selected>User</option>
+          <option>Manager</option>
+          <option>Admin</option>
+        </select>
+        <div class="flex justify-end space-x-2">
+          <button type="button" class="bg-gray-300 px-4 py-2 rounded" onclick="document.getElementById('editUserModal').classList.add('hidden')">Cancel</button>
+          <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+<script>
+  const users = [
+    { name: "John Doe", email: "john@example.com" },
+    { name: "Jane Smith", email: "jane@company.com" },
+    { name: "Michael Blue", email: "michael@domain.com" },
+    // Add more user objects here
+  ];
+
+  const input = document.getElementById('userSearch');
+  const suggestions = document.getElementById('searchSuggestions');
+
+  function filterUsers() {
+    const query = input.value.toLowerCase();
+    suggestions.innerHTML = '';
+    if (!query) {
+      suggestions.classList.add('hidden');
+      return;
+    }
+
+    const filtered = users.filter(u => 
+      u.name.toLowerCase().includes(query) || 
+      u.email.toLowerCase().includes(query)
+    );
+
+    filtered.forEach(user => {
+      const li = document.createElement('li');
+      li.className = 'px-4 py-2 hover:bg-blue-100 cursor-pointer';
+      li.textContent = `${user.name} (${user.email})`;
+      li.onclick = () => {
+        input.value = user.name;
+        suggestions.classList.add('hidden');
+        // You could also trigger a table filter here
+      };
+      suggestions.appendChild(li);
+    });
+
+    suggestions.classList.toggle('hidden', filtered.length === 0);
+  }
+
+  // Hide suggestions when clicking outside
+  document.addEventListener('click', e => {
+    if (!suggestions.contains(e.target) && e.target !== input) {
+      suggestions.classList.add('hidden');
+    }
+  });
+</script>
+
+</body>
+</html>

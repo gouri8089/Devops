@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<script>
+  const token = localStorage.getItem("token");
+  if (!token) {
+    
+      // You are not on the login page
+      alert("You are not logged in. Redirecting to login page.");
+      window.location.href = "./login.html";
+    
+    
+  }
+</script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>System Alert Settings - Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex min-h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md p-6 hidden md:block">
+    <h1 class="text-2xl font-bold text-blue-600 mb-8">Alert System</h1>
+    <nav class="space-y-4">
+      <a href="./a-dashboard.html" class="block text-gray-700 hover:text-blue-600">Dashboard</a>
+      <a href="./a-manage-users.html" class="block text-gray-700 hover:text-blue-600">Manage Users</a>
+      <a href="./a-manage-roles.html" class="block text-gray-700 hover:text-blue-600">Manage Roles</a>
+      <a href="./a-all-alerts.html" class="block text-gray-700 hover:text-blue-600">All Alerts</a>
+      <a href="#" class="block font-bold text-blue-600">System Alert Settings</a>
+      <a href="./a-alerts-history.html" class="block text-gray-700 hover:text-blue-600">Alert History</a>
+      <a href="./a-permissions.html" class="block text-gray-700 hover:text-blue-600">Permissions and Access Control</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Navbar -->
+    <header class="bg-white shadow-md flex items-center justify-between px-6 py-4">
+      <div class="flex items-center space-x-4">
+        <img src="./images/logo.avif" alt="Logo" class="h-10 w-10 rounded-full" />
+        <span class="text-xl font-semibold text-gray-800">System Alert Settings</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <img src="./images/user.png" alt="Profile" class="h-10 w-10 rounded-full" />
+        <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+        <script src="./js/logout.js"></script>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="p-6 space-y-6 flex-1">
+      <div class="bg-white rounded-xl shadow p-6 space-y-6">
+        <h2 class="text-2xl font-bold text-gray-700">Global Alert Defaults</h2>
+
+        <!-- Document Type Selection -->
+        <div>
+          <label class="block text-gray-700 font-semibold mb-1">Select Document Type</label>
+          <select id="docTypeSelect" class="w-full border px-4 py-2 rounded">
+            <option value="aadhar">Aadhar</option>
+            <option value="prescription">Prescription</option>
+            <option value="license">License</option>
+            <option value="passport">Passport</option>
+            <option value="custom">Custom Document</option>
+          </select>
+        </div>
+
+        <!-- Lead Time -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-gray-700 font-semibold mb-1">Default Lead Time</label>
+            <input type="number" class="w-full border px-4 py-2 rounded" placeholder="Enter number (e.g. 5)" />
+          </div>
+          <div>
+            <label class="block text-gray-700 font-semibold mb-1">Lead Time Unit</label>
+            <select class="w-full border px-4 py-2 rounded">
+              <option>Days</option>
+              <option>Weeks</option>
+              <option>Months</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Default Method -->
+        <div>
+          <label class="block text-gray-700 font-semibold mb-1">Default Alert Method</label>
+          <select class="w-full border px-4 py-2 rounded">
+            <option>SMS</option>
+            <option>Email</option>
+            <option>Push Notification</option>
+          </select>
+        </div>
+
+        <!-- Enable/Disable for Document Type -->
+        <div>
+          <h3 class="text-lg font-semibold text-gray-700 mt-6 mb-2">Alert Status for Selected Document Type</h3>
+          <div class="flex items-center space-x-4">
+            <span class="text-gray-700">Status:</span>
+            <button id="enableBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+              Enable
+            </button>
+            <button id="disableBtn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+              Disable
+            </button>
+          </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="flex justify-end mt-4">
+          <button class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+            Save Settings
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Simple Script to Show Toggle Behavior -->
+  <script>
+    const enableBtn = document.getElementById('enableBtn');
+    const disableBtn = document.getElementById('disableBtn');
+
+    enableBtn.addEventListener('click', () => {
+      enableBtn.classList.remove('bg-gray-400');
+      enableBtn.classList.add('bg-green-500');
+      disableBtn.classList.remove('bg-red-500');
+      disableBtn.classList.add('bg-gray-400');
+    });
+
+    disableBtn.addEventListener('click', () => {
+      disableBtn.classList.remove('bg-gray-400');
+      disableBtn.classList.add('bg-red-500');
+      enableBtn.classList.remove('bg-green-500');
+      enableBtn.classList.add('bg-gray-400');
+    });
+  </script>
+</body>
+</html>

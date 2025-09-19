@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<script>
+  const token = localStorage.getItem("token");
+  if (!token) {
+    
+      // You are not on the login page
+      alert("You are not logged in. Redirecting to login page.");
+      window.location.href = "./login.html";
+    
+    
+  }
+</script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Alerts History - Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-lg p-6 hidden md:block">
+    <h1 class="text-2xl font-bold text-blue-600 mb-8">Alert System</h1>
+    <nav class="space-y-4">
+      <a href="./m-dashboard.html" class="block text-gray-700 hover:text-blue-600 font-medium">Dashboard</a>
+      <a href="./m-user-alerts.html" class="block text-gray-700 hover:text-blue-600 font-medium">User Alerts</a>
+      <a href="./m-alerts-by-type.html" class="block text-gray-700 hover:text-blue-600 font-medium">Alerts By Type</a>
+      <a href="#" class="block text-blue-600 font-bold">Alert History</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Navbar -->
+    <header class="bg-white shadow-md flex items-center justify-between px-6 py-4">
+      <div class="flex items-center space-x-4">
+        <img src="./images/logo.avif" class="h-10 w-10 rounded-full" alt="Logo" />
+        <span class="text-xl font-semibold text-gray-800">Alerts History</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <img src="./images/user.png" class="h-10 w-10 rounded-full" alt="Profile" />
+        <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+        <script src="./js/logout.js"></script>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="p-6 space-y-6 flex-1">
+      <div class="bg-white p-6 rounded-xl shadow overflow-auto">
+        <table class="min-w-full text-sm text-left border">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="p-3 border-b font-semibold">Alert ID</th>
+              <th class="p-3 border-b font-semibold">User Name</th>
+              <th class="p-3 border-b font-semibold">Item Name</th>
+              <th class="p-3 border-b font-semibold">Date Sent</th>
+              <th class="p-3 border-b font-semibold">Status</th>
+              <th class="p-3 border-b font-semibold">Response Log</th>
+            </tr>
+          </thead>
+          <tbody id="historyTable">
+            <!-- Dynamic rows will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const historyTable = document.getElementById('historyTable');
+
+    // Example data - replace with real backend values
+    const historyData = [
+      {
+        id: 'ALRT1001',
+        user: 'jane@gmail.com',
+        item: 'Aadhar',
+        date: '2025-05-30',
+        status: 'Sent',
+        log: 'Delivered successfully at 10:42 AM'
+      },
+      {
+        id: 'ALRT1002',
+        user: 'alex@gmail.com',
+        item: 'Prescription',
+        date: '2025-05-29',
+        status: 'Failed',
+        log: 'Network error during delivery attempt'
+      },
+      {
+        id: 'ALRT1003',
+        user: 'lisa@gmail.com',
+        item: 'License',
+        date: '2025-05-28',
+        status: 'Sent',
+        log: 'Delivered via push at 09:13 AM'
+      }
+    ];
+
+    function renderHistory() {
+      historyTable.innerHTML = '';
+      historyData.forEach(alert => {
+        const row = `
+          <tr class="hover:bg-gray-50">
+            <td class="p-3 border-b">${alert.id}</td>
+            <td class="p-3 border-b">${alert.user}</td>
+            <td class="p-3 border-b">${alert.item}</td>
+            <td class="p-3 border-b">${alert.date}</td>
+            <td class="p-3 border-b font-semibold text-${getColor(alert.status)}-600">${alert.status}</td>
+            <td class="p-3 border-b text-gray-700">${alert.log}</td>
+          </tr>
+        `;
+        historyTable.insertAdjacentHTML('beforeend', row);
+      });
+    }
+
+    function getColor(status) {
+      switch (status.toLowerCase()) {
+        case 'sent': return 'green';
+        case 'failed': return 'red';
+        default: return 'gray';
+      }
+    }
+
+    renderHistory();
+  </script>
+</body>
+</html>

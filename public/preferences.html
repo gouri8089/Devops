@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<script>
+  const token1 = localStorage.getItem("token");
+  if (!token1) {
+    
+      // You are not on the login page
+      alert("You are not logged in. Redirecting to login page.");
+      window.location.href = "./login.html";
+    
+    
+  }
+</script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preferences</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-lg p-6 hidden md:block">
+    <h1 class="text-2xl font-bold text-blue-600 mb-8">Alert System</h1>
+    <nav class="space-y-4">
+      <a href="./dashboard.html" class="block text-gray-700 hover:text-blue-600 font-medium">Dashboard</a>
+      <a href="./add-alert.html" class="block text-gray-700 hover:text-blue-600 font-medium">Add Alert</a>
+      <a href="./my-alerts.html" class="block text-gray-700 hover:text-blue-600 font-medium">My Alerts</a>
+      <a href="#" class="block text-blue-600 font-bold">Preferences</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-md flex items-center justify-between px-6 py-4">
+      <div class="flex items-center space-x-4">
+        <img src="./images/logo.avif" class="h-10 w-10 rounded-full" alt="Logo">
+        <span class="text-xl font-semibold text-gray-800">Preferences</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <img src="./images/user.png" class="h-10 w-10 rounded-full" alt="Profile" />
+        <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+        <script src="./js/logout.js"></script>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="p-6 flex-1">
+      <h2 class="text-2xl font-semibold mb-6">Alert Preferences</h2>
+
+      <form class="bg-white p-6 rounded-xl shadow space-y-6 max-w-2xl">
+
+        <!-- Document ID Dropdown -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2" for="documentId">Select Document ID</label>
+          <select id="documentId" name="documentId"
+            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+            <!-- <option value="">-- Select Document ID --</option>
+            <option value="ALRT-001">ALRT-001</option>
+            <option value="ALRT-002">ALRT-002</option> -->
+            <!-- Populate dynamically -->
+          </select>
+        </div>
+
+        <!-- Lead Time Type -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2" for="leadType">Lead Time Type</label>
+          <select id="leadType" name="leadType"
+            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+            <option value="">-- Select Lead Time Type --</option>
+            <option value="years">Year</option>
+            <option value="months">Month</option>
+            <option value="weeks">Week</option>
+            <option value="days">Day</option>
+          </select>
+        </div>
+
+        <!-- Lead Time Value -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2" for="leadValue">Lead Time Value</label>
+          <input type="number" id="leadValue" name="leadValue" min="1"
+            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Enter number of days/weeks/months/years" required />
+        </div>
+
+        <!-- Alert Type Dropdown -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-2" for="alertType">Alert Type</label>
+          <select id="alertType" name="alertType"
+            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+            <!-- <option value="">-- Select Alert Type --</option>
+            <option value="sms">SMS</option>
+            <option value="push">Push Notification</option>
+            <option value="email">Email</option> -->
+          </select>
+        </div>
+
+        <!-- Save Button -->
+        <div>
+          <button type="submit"
+            class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 w-full sm:w-auto">
+            Save Preferences
+          </button>
+        </div>
+
+      </form>
+    </main>
+  </div>
+<script>
+
+  
+
+
+  const token = localStorage.getItem("token");
+
+  const documentSelect = document.getElementById("documentId");
+  const alertTypeSelect = document.getElementById("alertType");
+  const form = document.querySelector("form");
+  // For Document ID
+  documentSelect.innerHTML = '<option value="">-- Select Document ID --</option>';
+
+  // For Alert Type
+  alertTypeSelect.innerHTML = '<option value="">-- Select Alert Type --</option>';
+  // Populate Documents
+  async function loadDocuments() {
+    try {
+      const res = await fetch('/api/documents/my-documents', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      // console.log(data);
+      data.documents.forEach(doc => {
+        const opt = document.createElement('option');
+        opt.value = doc._id;
+        // console.log(doc);
+        // console.log(doc._id);
+        // console.log(doc.item_name);
+        opt.textContent = doc.item_name+ ' (' + doc._id.slice(-5).toUpperCase() + ')'; // e.g., 'Document Name (ALRT-001)'
+        documentSelect.appendChild(opt);
+      });
+    } catch (err) {
+      console.error("Failed to load documents", err);
+    }
+  }
+
+  // Populate Alert Types
+  async function loadAlertTypes() {
+    try {
+      const res = await fetch('/api/alert-types', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      // console.log(data);
+      //console.log(data.types);
+      data.forEach(type => {
+        const opt = document.createElement('option');
+        opt.value = type.name.toLowerCase(); // e.g., 'sms'
+        opt.textContent = type.name;
+        alertTypeSelect.appendChild(opt);
+      });
+    } catch (err) {
+      console.error("Failed to load alert types", err);
+    }
+  }
+
+  // Handle Save
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      documentId: documentSelect.value,
+      leadType: document.getElementById("leadType").value,
+      leadValue: document.getElementById("leadValue").value,
+      alertType: alertTypeSelect.value
+    };
+
+    try {
+      const res = await fetch('/api/preferences', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        alert("Preferences saved successfully!");
+        form.reset();
+      } else {
+        alert(result.error || "Error saving preferences");
+      }
+    } catch (err) {
+      console.error("Failed to save preferences", err);
+    }
+  });
+
+  // Initialize
+  loadDocuments();
+  loadAlertTypes();
+</script>
+
+</body>
+</html>
