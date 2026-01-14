@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<script>
+  const token = localStorage.getItem("token");
+  
+  if (!token) {
+    
+      // You are not on the login page
+      alert("You are not logged in. Redirecting to login page.");
+      window.location.href = "./login.html";
+  // After successful login and getting user data:
+
+  }
+</script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alert Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-lg p-6 hidden md:block">
+    <h1 class="text-2xl font-bold text-blue-600 mb-8">Alert System</h1>
+    <nav class="space-y-4">
+      <a href="#" class="block text-blue-600 font-bold">Dashboard</a>
+      <a href="./add-alert.html" class="block text-gray-700 hover:text-blue-600 font-medium">Add Alert</a>
+      <a href="./my-alerts.html" class="block text-gray-700 hover:text-blue-600 font-medium">My Alerts</a>
+      <a href="./preferences.html" class="block text-gray-700 hover:text-blue-600 font-medium">Preferences</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-md flex items-center justify-between px-6 py-4">
+      <div class="flex items-center space-x-4">
+        <img src="./images/logo.avif" class="h-10 w-10 rounded-full" alt="Logo">
+        <span class="text-xl font-semibold text-gray-800">Dashboard</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <img src="./images/user.png" class="h-10 w-10 rounded-full" alt="Profile" />
+        <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+        <script src="./js/logout.js"></script>
+
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <main class="p-6 flex-1">
+      <h2 class="text-2xl font-semibold mb-6">
+  Welcome, <span id="uName" class="text-blue-600"></span>!
+</h2>
+<script>
+  //console.log("User Name:", localStorage.getItem('username'));
+  document.getElementById('uName').textContent = localStorage.getItem('username') || 'User';
+</script>
+
+      <!-- Alert Summary -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+          <h3 class="text-lg font-semibold text-gray-700">Total Alerts</h3>
+          <p id="totalAlerts" class="text-4xl font-bold text-blue-500 mt-2">0</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+          <h3 class="text-lg font-semibold text-gray-700">Pending Alerts</h3>
+          <p id="pendingAlerts" class="text-4xl font-bold text-yellow-500 mt-2">0</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+          <h3 class="text-lg font-semibold text-gray-700">Sent Alerts</h3>
+          <p id="sentAlerts" class="text-4xl font-bold text-green-500 mt-2">0</p>
+        </div>
+      </div>
+
+      <!-- Upcoming Alerts Section -->
+      <div class="bg-white p-6 rounded-xl shadow">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-gray-800">Upcoming Alerts</h3>
+          <div class="space-x-2">
+            <button id="add" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add Alert</button>
+            <button id="view" class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">View Alerts</button>
+          </div>
+        </div>
+        <div class=".bg-white ul.space-y-4">  
+            <ul class="space-y-4">
+              <!-- Upcoming alerts will be dynamically loaded here -->
+            </ul>
+        </div>
+        
+      </div>
+    </main>
+  </div>
+  <script>
+  document.getElementById('add').onclick = function() {
+    window.location.href = './add-alert.html';
+  };
+  document.getElementById('view').onclick = function() {
+    window.location.href = './my-alerts.html';
+  };
+</script>
+<script>
+async function loadUpcomingAlerts() {
+  const token = localStorage.getItem("token");
+  const ul = document.querySelector('.bg-white ul.space-y-4');
+  if (!ul) return;
+  ul.innerHTML = '<li>Loading...</li>';
+  try {
+    const res = await fetch('/api/documents/my-documents', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    //console.log("Upcoming Alerts Data:", data);
+    if (data.documents && data.documents.length > 0) {
+      ul.innerHTML = data.documents.map(doc => `
+        <li class="border-b pb-4">
+          <div class="flex justify-between">
+            <span class="text-gray-700">${doc.item_name || 'No Name'}${doc.notes ? ' - ' + doc.notes : ''}</span>
+            <span class="text-sm text-gray-500">${doc.expiry_date ? new Date(doc.expiry_date).toLocaleDateString() : ''}</span>
+          </div>
+        </li>
+      `).join('');
+    } else {
+      ul.innerHTML = '<li class="text-gray-500">No upcoming alerts.</li>';
+    }
+  } catch (err) {
+    ul.innerHTML = '<li class="text-red-500">Failed to load alerts.</li>';
+  }
+}
+loadUpcomingAlerts();
+</script>
+<script>
+async function loadDashboardCounts() {
+  const token = localStorage.getItem("token");
+  // Fetch documents (for total alerts)
+  const docRes = await fetch('/api/documents/my-documents', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const docData = await docRes.json();
+  document.getElementById('totalAlerts').textContent = docData.documents ? docData.documents.length : 0;
+
+  // Fetch alerts (for pending/sent)
+  const alertRes = await fetch('/api/alerts/my-alerts', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const alertData = await alertRes.json();
+  if (alertData.alerts && alertData.alerts.length > 0) {
+    const pending = alertData.alerts.filter(a => !a.is_sent).length;
+    const sent = alertData.alerts.filter(a => a.is_sent).length;
+    document.getElementById('pendingAlerts').textContent = pending;
+    document.getElementById('sentAlerts').textContent = sent;
+  } else {
+    document.getElementById('pendingAlerts').textContent = 0;
+    document.getElementById('sentAlerts').textContent = 0;
+  }
+}
+loadDashboardCounts();
+</script>
+</body>
+</html>

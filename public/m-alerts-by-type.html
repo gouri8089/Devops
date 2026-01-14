@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<script>
+  const token = localStorage.getItem("token");
+  if (!token) {
+    
+    
+      // You are not on the login page
+      alert("You are not logged in. Redirecting to login page.");
+      window.location.href = "./login.html";
+    
+    
+  }
+</script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Alerts by Type - Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-lg p-6 hidden md:block">
+    <h1 class="text-2xl font-bold text-blue-600 mb-8">Alert System</h1>
+    <nav class="space-y-4">
+      <a href="./m-dashboard.html" class="block text-gray-700 hover:text-blue-600 font-medium">Dashboard</a>
+      <a href="./m-user-alerts.html" class="block text-gray-700 hover:text-blue-600 font-medium">User Alerts</a>
+      <a href="#" class="block text-blue-600 font-bold">Alerts By Type</a>
+      <a href="./m-alert-history.html" class="block text-gray-700 hover:text-blue-600 font-medium">Alert History</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Navbar -->
+    <header class="bg-white shadow-md flex items-center justify-between px-6 py-4">
+      <div class="flex items-center space-x-4">
+        <img src="./images//logo.avif" class="h-10 w-10 rounded-full" alt="Logo" />
+        <span class="text-xl font-semibold text-gray-800">Alerts By Type</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <img src="./images/user.png" class="h-10 w-10 rounded-full" alt="Profile" />
+        <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+        <script src="./js/logout.js"></script>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="p-6 space-y-6 flex-1">
+      <!-- Dropdown -->
+      <div class="bg-white p-6 rounded-xl shadow">
+        <label for="alertType" class="block text-gray-700 font-medium mb-2">Select Alert Category</label>
+        <select id="alertType" class="w-full p-3 border border-gray-300 rounded-lg">
+          <option value="document">Document Expiry</option>
+          <option value="prescription">Prescription Reminder</option>
+        </select>
+      </div>
+
+      <!-- Alerts Table -->
+      <div class="bg-white p-6 rounded-xl shadow overflow-auto">
+        <table class="min-w-full text-sm text-left border">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="p-3 border-b font-semibold">Alert Type</th>
+              <th class="p-3 border-b font-semibold">User Name</th>
+              <th class="p-3 border-b font-semibold">Status</th>
+              <th class="p-3 border-b font-semibold">Download</th>
+            </tr>
+          </thead>
+          <tbody id="alertTable">
+            <!-- Dynamic rows go here -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const alertTypeSelect = document.getElementById('alertType');
+    const alertTable = document.getElementById('alertTable');
+
+    const alertData = {
+      document: [
+        { type: 'Document Expiry', user: 'jane@gmail.com', status: 'Pending', file: 'aadhar.pdf' },
+        { type: 'Document Expiry', user: 'alex@gmail.com', status: 'Sent', file: 'license.pdf' },
+      ],
+      prescription: [
+        { type: 'Prescription Reminder', user: 'john@gmail.com', status: 'Sent', file: 'rx-john.pdf' },
+        { type: 'Prescription Reminder', user: 'lisa@gmail.com', status: 'Failed', file: 'rx-lisa.pdf' },
+      ]
+    };
+
+    function renderTable(type) {
+      const data = alertData[type] || [];
+      alertTable.innerHTML = "";
+      data.forEach(alert => {
+        const row = `
+          <tr class="hover:bg-gray-50">
+            <td class="p-3 border-b">${alert.type}</td>
+            <td class="p-3 border-b">${alert.user}</td>
+            <td class="p-3 border-b text-${getColor(alert.status)}-600 font-semibold">${alert.status}</td>
+            <td class="p-3 border-b">
+              <a href="/files/${alert.file}" download class="text-blue-600 hover:underline">Download</a>
+            </td>
+          </tr>`;
+        alertTable.insertAdjacentHTML('beforeend', row);
+      });
+    }
+
+    function getColor(status) {
+      switch(status.toLowerCase()) {
+        case 'sent': return 'green';
+        case 'pending': return 'yellow';
+        case 'failed': return 'red';
+        default: return 'gray';
+      }
+    }
+
+    alertTypeSelect.addEventListener('change', () => {
+      renderTable(alertTypeSelect.value);
+    });
+
+    // Initial load
+    renderTable('document');
+  </script>
+</body>
+</html>

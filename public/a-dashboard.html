@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<script>
+  const token = localStorage.getItem("token");
+  if (!token) {
+    
+      // You are not on the login page
+      alert("You are not logged in. Redirecting to login page.");
+      window.location.href = "./login.html";
+    
+    
+  }
+</script>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - Alert System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 flex min-h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md p-6 hidden md:block">
+    <h1 class="text-2xl font-bold text-blue-600 mb-8">Alert System</h1>
+    <nav class="space-y-4">
+      <a href="#" class="block text-blue-600 font-bold">Dashboard</a>
+      <a href="./a-manage-users.html" class="block text-gray-700 hover:text-blue-600">Manage Users</a>
+      <a href="./a-manage-roles.html" class="block text-gray-700 hover:text-blue-600">Manage Roles</a>
+      <a href="./a-all-alerts.html" class="block text-gray-700 hover:text-blue-600">All Alerts</a>
+      <a href="./a-system-alert-settings.html" class="block text-gray-700 hover:text-blue-600">System Alert Settings</a>
+      <a href="./a-alerts-history.html" class="block text-gray-700 hover:text-blue-600">Alert History</a>
+      <a href="./a-permissions.html" class="block text-gray-700 hover:text-blue-600">Permissions and Access Control</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Navbar -->
+    <header class="bg-white shadow-md flex items-center justify-between px-6 py-4">
+      <div class="flex items-center space-x-4">
+        <img src="./images/logo.avif" alt="Logo" class="h-10 w-10 rounded-full" />
+        <span class="text-xl font-semibold text-gray-800">Admin Dashboard</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <img src="./images/user.png" alt="Profile" class="h-10 w-10 rounded-full" />
+        <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+        <script src="./js/logout.js"></script>
+      </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <main class="p-6 space-y-6 flex-1">
+      <!-- Stats -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+          <h2 class="text-gray-600 text-lg font-medium">Total Users</h2>
+          <p class="text-4xl text-blue-600 font-bold mt-2">235</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+          <h2 class="text-gray-600 text-lg font-medium">Total Alerts</h2>
+          <p class="text-4xl text-green-500 font-bold mt-2">578</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+          <h2 class="text-gray-600 text-lg font-medium">Active vs Inactive</h2>
+          <p class="text-4xl text-yellow-500 font-bold mt-2">180 / 55</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow text-center">
+          <h2 class="text-gray-600 text-lg font-medium">Alerts Sent Today</h2>
+          <p class="text-4xl text-red-500 font-bold mt-2">43</p>
+        </div>
+      </div>
+
+      <!-- Graph Buttons -->
+      <div class="flex flex-wrap gap-4 mt-6">
+        <button onclick="showChart('type')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Show Alerts by Type
+        </button>
+        <button onclick="showChart('role')" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+          Show Users by Role
+        </button>
+      </div>
+
+      <!-- Chart Section -->
+      <div class="bg-white mt-4 p-6 rounded-xl shadow">
+        <canvas id="dashboardChart" height="100"></canvas>
+      </div>
+
+      <!-- Recent Logs -->
+      <div class="bg-white mt-6 p-6 rounded-xl shadow">
+        <h2 class="text-lg font-semibold mb-4">Recent Log Activities</h2>
+        <ul class="list-disc list-inside space-y-2 text-gray-700">
+          <li>User john@gmail.com updated preferences</li>
+          <li>Alert ALRT1012 sent to jane@gmail.com</li>
+          <li>Admin added a new role: Supervisor</li>
+          <li>User alex@gmail.com deleted an alert</li>
+          <li>System scheduled 5 alerts</li>
+          <li>Failed attempt to send alert to lisa@gmail.com</li>
+          <li>User rachel@gmail.com logged in</li>
+          <li>Alert ALRT1021 marked as missed</li>
+          <li>Admin revoked access for user brian@gmail.com</li>
+          <li>System sent 3 email notifications</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let chartInstance;
+
+    function showChart(type) {
+      const ctx = document.getElementById('dashboardChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      if (type === 'type') {
+        chartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Document', 'Prescription', 'License'],
+            datasets: [{
+              label: 'Alerts by Type',
+              data: [120, 90, 45],
+              backgroundColor: ['#3B82F6', '#10B981', '#F59E0B'],
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false }
+            }
+          }
+        });
+      } else {
+        chartInstance = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: ['Admin', 'Manager', 'User'],
+            datasets: [{
+              label: 'Users by Role',
+              data: [5, 12, 218],
+              backgroundColor: ['#8B5CF6', '#F43F5E', '#0EA5E9'],
+            }]
+          },
+          options: {
+            responsive: true,
+          }
+        });
+      }
+    }
+
+    // Initial chart
+    showChart('type');
+  </script>
+</body>
+</html>

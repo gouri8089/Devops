@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<script>
+  const token = localStorage.getItem("token");
+  if (!token) {
+    
+      // You are not on the login page
+      alert("You are not logged in. Redirecting to login page.");
+      window.location.href = "./login.html";
+    
+    
+  }
+</script>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>All Alerts - Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex min-h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md p-6 hidden md:block">
+    <h1 class="text-2xl font-bold text-blue-600 mb-8">Alert System</h1>
+    <nav class="space-y-4">
+      <a href="./a-dashboard.html" class="block text-gray-700 hover:text-blue-600">Dashboard</a>
+      <a href="./a-manage-users.html" class="block text-gray-700 hover:text-blue-600">Manage Users</a>
+      <a href="./a-manage-roles.html" class="block text-gray-700 hover:text-blue-600">Manage Roles</a>
+      <a href="#" class="block font-bold text-blue-600">All Alerts</a>
+      <a href="./a-system-alert-settings.html" class="block text-gray-700 hover:text-blue-600">System Alert Settings</a>
+      <a href="./a-alerts-history.html" class="block text-gray-700 hover:text-blue-600">Alert History</a>
+      <a href="./a-permissions.html" class="block text-gray-700 hover:text-blue-600">Permissions and Access Control</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Navbar -->
+    <header class="bg-white shadow-md flex items-center justify-between px-6 py-4">
+      <div class="flex items-center space-x-4">
+        <img src="./images/logo.avif" alt="Logo" class="h-10 w-10 rounded-full" />
+        <span class="text-xl font-semibold text-gray-800">All Alerts</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <img src="./images/user.png" alt="Profile" class="h-10 w-10 rounded-full" />
+        <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+        <script src="./js/logout.js"></script>
+      </div>
+    </header>
+
+    <!-- Filters and Bulk Actions -->
+    <main class="p-6 space-y-6 flex-1">
+      <div class="bg-white p-4 rounded-lg shadow space-y-4">
+        <div class="grid md:grid-cols-4 gap-4">
+          <input type="text" placeholder="Search by user" class="w-full border px-4 py-2 rounded" />
+          <select class="w-full border px-4 py-2 rounded">
+            <option value="">All Types</option>
+            <option value="document">Document Expiry</option>
+            <option value="prescription">Prescription Reminder</option>
+          </select>
+          <input type="date" class="w-full border px-4 py-2 rounded" />
+          <select class="w-full border px-4 py-2 rounded">
+            <option value="">All Statuses</option>
+            <option value="sent">Sent</option>
+            <option value="pending">Pending</option>
+            <option value="failed">Failed</option>
+          </select>
+        </div>
+        <div class="flex justify-end space-x-4">
+          <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete Selected</button>
+          <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Resend Selected</button>
+        </div>
+      </div>
+
+      <!-- Alerts Table -->
+      <div class="overflow-x-auto bg-white rounded-xl shadow">
+        <table class="min-w-full text-sm text-left">
+          <thead class="bg-gray-100 text-gray-700 uppercase">
+            <tr>
+              <th class="px-4 py-3"><input type="checkbox" /></th>
+              <th class="px-6 py-3">User</th>
+              <th class="px-6 py-3">Type</th>
+              <th class="px-6 py-3">Date</th>
+              <th class="px-6 py-3">Status</th>
+              <th class="px-6 py-3">Method</th>
+              <th class="px-6 py-3">Message</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y">
+            <tr>
+              <td class="px-4 py-2"><input type="checkbox" /></td>
+              <td class="px-6 py-4 font-medium text-gray-900">jane.doe@example.com</td>
+              <td class="px-6 py-4">Document Expiry</td>
+              <td class="px-6 py-4">2025-06-05</td>
+              <td class="px-6 py-4 text-yellow-600 font-semibold">Pending</td>
+              <td class="px-6 py-4">Email</td>
+              <td class="px-6 py-4">
+                <button onclick="alert('Message: Your Aadhar is expiring soon.')" class="text-blue-600 hover:underline">View</button>
+              </td>
+            </tr>
+            <!-- More alert rows -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+  
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+  <!-- Navbar -->
+  <header class="bg-white shadow-md flex items-center justify-between px-6 py-4">
+    <div class="flex items-center">
+      <img src="./images/logo.avif" class="h-10 w-10 rounded-full mr-4" alt="Logo">
+      <span class="text-2xl font-bold text-blue-600">Alert System</span>
+    </div>
+    <nav class="flex items-center space-x-6">
+      <a href="index.html" class="text-gray-700 hover:text-blue-600 font-medium">Home</a>
+      <a href="about.html" class="text-gray-700 hover:text-blue-600 font-medium">About Us</a>
+      <a href="contact.html" class="text-gray-700 hover:text-blue-600 font-medium">Contact</a>
+    </nav>
+  </header>
+
+  <!-- Registration Card -->
+  <main class="flex-1 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+      <h2 class="text-2xl font-semibold text-blue-600 mb-6 text-center">Create an Account</h2>
+      <form id="registerForm" class="space-y-4">
+        <input type="text" id="name" placeholder="Full Name" required class="border border-gray-300 rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <input type="email" id="email" placeholder="Email" required class="border border-gray-300 rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <input type="password" id="password" placeholder="Password" required class="border border-gray-300 rounded px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400">
+        
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded w-full transition">Register</button>
+        <p id="error" class="text-red-500 mt-2 text-center"></p>
+      </form>
+      <p class="mt-4 text-center text-gray-600">Already have an account? <a href="login.html" class="text-blue-600 hover:underline">Login</a></p>
+    </div>
+  </main>
+
+  <script>
+    // Fetch roles and populate dropdown
+
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const role = "User";
+
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: name,
+            email: email,
+            password: password,
+            role_name: role
+          }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert("Registration successful! Redirecting to login...");
+          window.location.href = "./login.html";
+        } else {
+          document.getElementById("error").textContent = data.message;
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById("error").textContent = "Registration failed.";
+      }
+    });
+  </script>
+</body>
+</html>

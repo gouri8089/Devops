@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Alert</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-lg p-6 hidden md:block">
+    <h1 class="text-2xl font-bold text-blue-600 mb-8">Alert System</h1>
+    <nav class="space-y-4">
+      <a href="./dashboard.html" class="block text-gray-700 hover:text-blue-600 font-medium">Dashboard</a>
+      <a href="#" class="block text-blue-600 font-bold">Add Alert</a>
+      <a href="./my-alerts.html" class="block text-gray-700 hover:text-blue-600 font-medium">My Alerts</a>
+      <a href="./preferences.html" class="block text-gray-700 hover:text-blue-600 font-medium">Preferences</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Navbar -->
+    <header class="bg-white shadow-md flex items-center justify-between px-6 py-4">
+      <div class="flex items-center space-x-4">
+        <img src="./images/logo.avif" class="h-10 w-10 rounded-full" alt="Logo">
+        <span class="text-xl font-semibold text-gray-800">Add Alert</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <img src="./images/user.png" class="h-10 w-10 rounded-full" alt="Profile" />
+        <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+      </div>
+    </header>
+
+    <!-- Form Content -->
+    <main class="p-6 flex-1">
+      <h2 class="text-2xl font-semibold mb-6">Create a New Alert</h2>
+
+      <form id="addAlertForm" class="bg-white p-6 rounded-xl shadow space-y-6 max-w-3xl" enctype="multipart/form-data">
+        <div>
+          <label class="block text-gray-700 font-medium mb-2" for="documentType">Document Type</label>
+          <input type="text" id="documentType" name="documentType" placeholder="e.g., Aadhaar, Prescription"
+            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium mb-2" for="alertType">Alert Type</label>
+          <select id="alertType" name="alertType"
+            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+            <option value=""></option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium mb-2" for="expiryDate">Expiry Date</label>
+          <input type="date" id="expiryDate" name="expiryDate"
+            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium mb-2" for="documentUpload">Upload Document (Image)</label>
+          <input type="file" id="documentUpload" name="documentUpload" accept="image/*"
+            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium mb-2" for="notes">Notes (optional)</label>
+          <textarea id="notes" name="notes" rows="4" placeholder="Any additional info..."
+            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+        </div>
+
+        <div>
+          <button type="submit"
+            class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 w-full sm:w-auto">
+            Submit Alert
+          </button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script>
+
+    
+
+    async function loadAlertTypes() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+      alert("You are not logged in. Redirecting...");
+      window.location.href = "./login.html";
+    }
+  const res = await fetch('/api/alert-types', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  const alertTypes = await res.json();
+
+  const select = document.getElementById('alertType');
+  alertTypes.forEach(type => {
+    const option = document.createElement('option');
+    option.value = type._id;
+    option.textContent = type.name;
+    select.appendChild(option);
+  });
+}
+window.onload = loadAlertTypes;
+
+
+    // ...existing code...
+
+// Helper to extract user_id from JWT token
+function getUserIdFromToken() {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+  const payload = token.split('.')[1];
+  if (!payload) return null;
+  try {
+    const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    return decoded.userId || decoded._id || decoded.id;
+  } catch {
+    return null;
+  }
+}
+
+// Form submission
+document.querySelector('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const token = localStorage.getItem('token');
+ if (!token) return null;
+  const payload = token.split('.')[1];
+  //console.log(payload);
+  const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+  //console.log(decoded);
+  //console.log(decoded.userId);
+  
+  
+  const userId = decoded.userId;
+  const documentType = document.getElementById('documentType').value;
+  const expiryDate = document.getElementById('expiryDate').value;
+  const alertTypeSelect = document.getElementById('alertType');
+  const alertType = alertTypeSelect.value; // ObjectId, if you need it
+  const alertMethod = alertTypeSelect.options[alertTypeSelect.selectedIndex].text; // This is the string name
+  const notes = document.getElementById('notes').value;
+
+  // Check if expiry date is before today
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Set to midnight for accurate comparison
+  const chosenDate = new Date(expiryDate);
+
+  if (chosenDate < today) {
+    alert('Expiry date cannot be before today.');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/alerts/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ userId,documentType, alertType, expiryDate, notes, alertMethod })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert('Alert created successfully!');
+      window.location.href = './my-alerts.html';
+    } else {
+      alert(data.message || 'Error creating alert.');
+    }
+  } catch (err) {
+    alert('Server error. Please try again.');
+  }
+});
+
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("token");
+      window.location.href = "./login.html";
+    });
+  </script>
+</body>
+</html>

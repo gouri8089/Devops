@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<script>
+  const token = localStorage.getItem("token");
+  if (!token) {
+    
+      // You are not on the login page
+      alert("You are not logged in. Redirecting to login page.");
+      window.location.href = "./login.html";
+    
+    
+  }
+</script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Alerts - Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-lg p-6 hidden md:block">
+    <h1 class="text-2xl font-bold text-blue-600 mb-8">Alert System</h1>
+    <nav class="space-y-4">
+      <a href="./m-dashboard.html" class="block text-gray-700 hover:text-blue-600 font-medium">Dashboard</a>
+      <a href="#" class="block text-blue-600 font-bold">User Alerts</a>
+      <a href="./m-alerts-by-type.html" class="block text-gray-700 hover:text-blue-600 font-medium">Alerts By Type</a>
+      <a href="./m-alert-history.html" class="block text-gray-700 hover:text-blue-600 font-medium">Alert History</a>
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Navbar -->
+    <header class="bg-white shadow-md flex items-center justify-between px-6 py-4">
+      <div class="flex items-center space-x-4">
+        <img src="./images/logo.avif" class="h-10 w-10 rounded-full" alt="Logo" />
+        <span class="text-xl font-semibold text-gray-800">User Alerts</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <img src="./images/user.png" class="h-10 w-10 rounded-full" alt="Profile" />
+        <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+        <script src="./js/logout.js"></script>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="p-6 space-y-6 flex-1">
+
+      <!-- Search User -->
+      <div class="bg-white p-6 rounded-xl shadow">
+        <label for="userSearch" class="block text-gray-700 font-medium mb-2">Search for a user</label>
+        <input id="userSearch" type="text" placeholder="Enter user name..."
+          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <!-- Filters + Alert Table -->
+      <div class="bg-white p-6 rounded-xl shadow hidden" id="userSection">
+
+        <!-- Filters -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div>
+            <label class="text-sm font-medium text-gray-600">Alert Type</label>
+            <select id="filterType" class="w-full mt-1 border p-2 rounded-lg">
+              <option value="">All</option>
+              <option value="SMS">SMS</option>
+              <option value="Push">Push</option>
+              <option value="Email">Email</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-600">Status</label>
+            <select id="filterStatus" class="w-full mt-1 border p-2 rounded-lg">
+              <option value="">All</option>
+              <option value="Pending">Pending</option>
+              <option value="Sent">Sent</option>
+              <option value="Missed">Missed</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-600">Expiry Date</label>
+            <input type="date" id="filterDate" class="w-full mt-1 border p-2 rounded-lg"/>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-auto">
+          <table class="min-w-full text-sm text-left border">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="p-3 border-b font-semibold">Item</th>
+                <th class="p-3 border-b font-semibold">Alert Type</th>
+                <th class="p-3 border-b font-semibold">Expiry Date</th>
+                <th class="p-3 border-b font-semibold">Status</th>
+              </tr>
+            </thead>
+            <tbody id="alertsTable">
+              <!-- Rows added by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const userSearchInput = document.getElementById('userSearch');
+    const userSection = document.getElementById('userSection');
+    const alertsTable = document.getElementById('alertsTable');
+    const filterType = document.getElementById('filterType');
+    const filterStatus = document.getElementById('filterStatus');
+    const filterDate = document.getElementById('filterDate');
+
+    // Dummy data: Replace with backend response
+    const userAlerts = [
+      { item: 'Aadhar', type: 'SMS', date: '2025-07-10', status: 'Sent' },
+      { item: 'License', type: 'Push', date: '2025-07-15', status: 'Pending' },
+      { item: 'Prescription', type: 'Email', date: '2025-07-20', status: 'Missed' },
+    ];
+
+    function renderTable(data) {
+      alertsTable.innerHTML = "";
+      data.forEach(alert => {
+        const row = `
+          <tr class="hover:bg-gray-50">
+            <td class="p-3 border-b">${alert.item}</td>
+            <td class="p-3 border-b">${alert.type}</td>
+            <td class="p-3 border-b">${alert.date}</td>
+            <td class="p-3 border-b">${alert.status}</td>
+          </tr>`;
+        alertsTable.insertAdjacentHTML('beforeend', row);
+      });
+    }
+
+    function applyFilters() {
+      let filtered = [...userAlerts];
+
+      const type = filterType.value;
+      const status = filterStatus.value;
+      const date = filterDate.value;
+
+      if (type) filtered = filtered.filter(a => a.type === type);
+      if (status) filtered = filtered.filter(a => a.status === status);
+      if (date) filtered = filtered.filter(a => a.date === date);
+
+      renderTable(filtered);
+    }
+
+    // Apply filters when filter inputs change
+    [filterType, filterStatus, filterDate].forEach(el => el.addEventListener('change', applyFilters));
+
+    userSearchInput.addEventListener('input', (e) => {
+      const value = e.target.value.toLowerCase();
+      if (value === "jane") {
+        userSection.classList.remove('hidden');
+        renderTable(userAlerts);
+      } else {
+        userSection.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
